@@ -1,116 +1,207 @@
-import { supabase } from './supabase'
+const API_URL = "/api"
 
-const API_URL = '/api'
-
-// Helper for authenticated requests
-async function fetchWithAuth(url: string, options: RequestInit = {}) {
+// Helper for public requests (no auth needed)
+async function fetchPublic(url: string, options: RequestInit = {}) {
   try {
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-    
-    if (sessionError) {
-      console.error('Session error:', sessionError)
-    }
-    
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     }
-    
-    if (session?.access_token) {
-      headers['Authorization'] = `Bearer ${session.access_token}`
-    } else {
-      console.warn('No access token available for request:', url)
-    }
-    
+
     const response = await fetch(url, { ...options, headers })
-    
-    // Handle non-JSON responses
-    const contentType = response.headers.get('content-type')
-    if (!contentType || !contentType.includes('application/json')) {
+
+    const contentType = response.headers.get("content-type")
+    if (!contentType || !contentType.includes("application/json")) {
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
       return { success: true }
     }
-    
+
     const data = await response.json()
-    
+
     if (!response.ok) {
-      throw new Error(data.detail || data.message || 'Request error')
+      throw new Error(data.detail || data.message || "Request error")
     }
-    
+
     return data
   } catch (err) {
-    console.error('API request failed:', url, err)
+    console.error("API request failed:", url, err)
     throw err
   }
 }
 
-// Products API (items for sale)
+// Helper for authenticated requests
+async function fetchWithAuth(url: string, options: RequestInit = {}) {
+  try {
+    const authData = typeof window !== "undefined" ? localStorage.getItem("dolce-vitta-auth") : null
+    const session = authData ? JSON.parse(authData) : null
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    }
+
+    if (session?.token) {
+      headers["Authorization"] = `Bearer ${session.token}`
+    }
+
+    const response = await fetch(url, { ...options, headers })
+
+    const contentType = response.headers.get("content-type")
+    if (!contentType || !contentType.includes("application/json")) {
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+      return { success: true }
+    }
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new Error(data.detail || data.message || "Request error")
+    }
+
+    return data
+  } catch (err) {
+    console.error("API request failed:", url, err)
+    throw err
+  }
+}
+
+// Auth API
+export const authApi = {
+  login: (email: string, password: string) =>
+    fetchPublic(`${API_URL}/auth/login`, {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    }),
+}
+
+// Products API
 export const productsApi = {
-  list: () => fetchWithAuth(`${API_URL}/products`),
-  
-  get: (id: string) => fetchWithAuth(`${API_URL}/products/${id}`),
-  
-  create: (product: { name: string; description?: string; price: number; category_id?: string; image_url?: string }) => 
+  list: () => fetchPublic(`${API_URL}/products`),
+  get: (id: string) => fetchPublic(`${API_URL}/products/${id}`),
+  create: (product: {
+    name: string
+    description?: string
+    price: number
+    category_id?: string
+    image_url?: string
+  }) =>
     fetchWithAuth(`${API_URL}/products`, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(product),
     }),
-  
-  update: (id: string, product: { name?: string; description?: string; price?: number; is_available?: boolean }) =>
+  update: (
+    id: string,
+    product: {
+      name?: string
+      description?: string
+      price?: number
+      is_available?: boolean
+      sort_order?: number
+      image_url?: string
+    },
+  ) =>
     fetchWithAuth(`${API_URL}/products/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(product),
     }),
-  
   delete: (id: string) =>
     fetchWithAuth(`${API_URL}/products/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
+    }),
+  reorder: (products: Array<{ id: string; sort_order: number }>) =>
+    fetchWithAuth(`${API_URL}/reorder/products`, {
+      method: "PUT",
+      body: JSON.stringify({ items: products }),
     }),
 }
 
 // Categories API
 export const categoriesApi = {
-  list: () => fetchWithAuth(`${API_URL}/categories`),
-  
-  create: (category: { name: string; description?: string }) => 
+  list: () => fetchPublic(`${API_URL}/categories`),
+  create: (category: { name: string; description?: string; image_url?: string }) =>
     fetchWithAuth(`${API_URL}/categories`, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(category),
+    }),
+  update: (
+    id: string,
+    category: {
+      name?: string
+      description?: string
+      image_url?: string
+      sort_order?: number
+      is_active?: boolean
+    },
+  ) =>
+    fetchWithAuth(`${API_URL}/categories/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(category),
+    }),
+  reorder: (categories: Array<{ id: string; sort_order: number }>) =>
+    fetchWithAuth(`${API_URL}/reorder/categories`, {
+      method: "PUT",
+      body: JSON.stringify({ items: categories }),
     }),
 }
 
 // Orders API
 export const ordersApi = {
   list: () => fetchWithAuth(`${API_URL}/orders`),
-  
-  create: (order: { 
-    customer_name: string; 
-    customer_order?: string;
-    items: Array<{ product_id: string; product_name: string; product_price: number; quantity: number }>;
-    total: number;
-  }) => 
-    fetchWithAuth(`${API_URL}/orders`, {
-      method: 'POST',
-      body: JSON.stringify(order),
+  deleteAll: () => fetchWithAuth(`${API_URL}/orders`, { method: "DELETE" }),
+}
+
+export const checkoutApi = {
+  create: (data: {
+    customer_name: string
+    items: Array<{
+      product_id: string
+      quantity: number
+    }>
+  }) =>
+    fetchPublic(`${API_URL}/checkout`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+}
+
+// About API
+export const aboutApi = {
+  get: () => fetchPublic(`${API_URL}/about`),
+  update: (data: {
+    name?: string
+    photo_url?: string
+    title?: string
+    story?: string
+    specialty?: string
+    experience_years?: number
+    quote?: string
+    instagram?: string
+    whatsapp?: string
+    email?: string
+    city?: string
+    accepts_orders?: boolean
+    delivery_areas?: string
+  }) =>
+    fetchWithAuth(`${API_URL}/about`, {
+      method: "PUT",
+      body: JSON.stringify(data),
     }),
 }
 
 // Users API
 export const usersApi = {
   getProfile: () => fetchWithAuth(`${API_URL}/users/profile`),
-  
   updateProfile: (data: { name?: string; phone?: string; avatar_url?: string }) =>
     fetchWithAuth(`${API_URL}/users/profile`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(data),
     }),
-  
   deleteAccount: () =>
     fetchWithAuth(`${API_URL}/users/account`, {
-      method: 'DELETE',
+      method: "DELETE",
     }),
 }
 
-// Keep itemsApi as alias for backwards compatibility
 export const itemsApi = productsApi

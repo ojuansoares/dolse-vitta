@@ -48,11 +48,18 @@ async def login(request: Request):
         return JSONResponse(content={
             "success": True,
             "message": "Login successful!",
+            "token": auth_response.session.access_token,
             "user": {
                 "id": auth_response.user.id,
-                "email": auth_response.user.email,
-                "name": admin_data.get("a_name"),
-                "is_admin": True
+                "email": auth_response.user.email
+            },
+            "admin_profile": {
+                "id": admin_data.get("id"),
+                "a_email": admin_data.get("a_email"),
+                "a_name": admin_data.get("a_name"),
+                "a_phone": admin_data.get("a_phone"),
+                "a_avatar_url": admin_data.get("a_avatar_url"),
+                "a_is_active": admin_data.get("a_is_active", True)
             },
             "session": {
                 "access_token": auth_response.session.access_token,

@@ -224,3 +224,53 @@ CREATE POLICY "order_item_select_admin" ON order_item
     FOR SELECT USING (
         auth.uid() IN (SELECT id FROM admin WHERE a_is_active = TRUE)
     );
+
+-- =============================================
+-- TABLE: about
+-- =============================================
+-- About page content (confeiteira info)
+-- Only one row expected
+CREATE TABLE IF NOT EXISTS about (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    ab_name VARCHAR(100) NOT NULL,
+    ab_photo_url TEXT,
+    ab_title VARCHAR(150),
+    ab_story TEXT,
+    ab_specialty TEXT,
+    ab_experience_years INTEGER,
+    ab_quote TEXT,
+    ab_instagram VARCHAR(100),
+    ab_whatsapp VARCHAR(20),
+    ab_email VARCHAR(100),
+    ab_city VARCHAR(100),
+    ab_accepts_orders BOOLEAN DEFAULT TRUE,
+    ab_delivery_areas TEXT,
+    ab_created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+    ab_updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ---------------------------------------------
+-- ABOUT policies
+-- ---------------------------------------------
+-- Enable RLS
+ALTER TABLE about ENABLE ROW LEVEL SECURITY;
+
+-- Anyone can read about page (public)
+CREATE POLICY "about_select_public" ON about 
+    FOR SELECT USING (TRUE);
+
+-- Only admins can insert/update/delete about
+CREATE POLICY "about_insert_admin" ON about 
+    FOR INSERT WITH CHECK (
+        auth.uid() IN (SELECT id FROM admin WHERE a_is_active = TRUE)
+    );
+
+CREATE POLICY "about_update_admin" ON about 
+    FOR UPDATE USING (
+        auth.uid() IN (SELECT id FROM admin WHERE a_is_active = TRUE)
+    );
+
+CREATE POLICY "about_delete_admin" ON about 
+    FOR DELETE USING (
+        auth.uid() IN (SELECT id FROM admin WHERE a_is_active = TRUE)
+    );
