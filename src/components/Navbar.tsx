@@ -1,17 +1,33 @@
 import { useState, useEffect } from "react"
 import { Link, useLocation } from "react-router-dom"
-import { ShoppingBag, Menu, X, User } from "lucide-react"
+import { ShoppingBag, Menu, X, User, LogOut } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
 import { useAuth } from "@/hooks/useAuth"
 import { cn } from "@/lib/utils"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 export default function Navbar() {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const { itemCount } = useCart()
   const { user, signOut } = useAuth()
   const location = useLocation()
   const pathname = location.pathname
+
+  const handleLogout = () => {
+    setShowLogoutConfirm(false)
+    signOut()
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,6 +50,30 @@ export default function Navbar() {
 
   return (
     <>
+      {/* Logout Confirmation Modal */}
+      <AlertDialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
+        <AlertDialogContent className="bg-cream-50">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-brown-600 font-serif">Sair do modo admin?</AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
+              Tem certeza que deseja sair? Você precisará fazer login novamente para acessar as funções administrativas.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-brown-200 text-brown-600 hover:bg-brown-50">
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleLogout}
+              className="bg-red-500 text-white hover:bg-red-600"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Sair
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <nav
         className={cn(
           "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-out",
@@ -104,7 +144,7 @@ export default function Navbar() {
                     <span className="text-sm font-medium">Admin</span>
                   </div>
                   <button
-                    onClick={() => signOut()}
+                    onClick={() => setShowLogoutConfirm(true)}
                     className="px-3 py-1.5 rounded-full text-sm font-medium bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-all duration-300"
                   >
                     Sair
@@ -165,7 +205,7 @@ export default function Navbar() {
                   <span className="text-sm font-semibold">Modo Admin</span>
                 </div>
                 <button
-                  onClick={() => signOut()}
+                  onClick={() => setShowLogoutConfirm(true)}
                   className="mx-4 my-2 w-[calc(100%-2rem)] px-4 py-2.5 rounded-xl text-sm font-medium bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-all duration-300"
                 >
                   Sair
