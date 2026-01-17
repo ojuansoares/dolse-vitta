@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/**/*.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "routes": [
+    { "src": "/api/auth/register", "dest": "/api/auth/register.py" },
+    { "src": "/api/auth/login", "dest": "/api/auth/login.py" },
+    { "src": "/api/auth/logout", "dest": "/api/auth/logout.py" },
+    { "src": "/api/auth/me", "dest": "/api/auth/me.py" },
+    { "src": "/api/users/profile", "dest": "/api/users/profile.py" },
+    { "src": "/api/users/account", "dest": "/api/users/account.py" },
+    { "src": "/api/products/([^/]+)", "dest": "/api/products/[id].py?product_id=$1" },
+    { "src": "/api/products", "dest": "/api/products/index.py" },
+    { "src": "/api/categories", "dest": "/api/categories/index.py" },
+    { "src": "/api/orders", "dest": "/api/orders/index.py" },
+    { "src": "/api/?", "dest": "/api/index.py" },
+    { "src": "/(.*)", "dest": "/$1" }
+  ]
+}
