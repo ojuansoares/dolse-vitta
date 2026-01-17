@@ -35,7 +35,6 @@ export default function Catalog() {
 
   // Admin editing state
   const [isEditing, setIsEditing] = useState(false)
-  const [hasChanges, setHasChanges] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [creatingCategory, setCreatingCategory] = useState(false)
@@ -236,7 +235,6 @@ export default function Catalog() {
         image_url: data.c_image_url,
       })
       setEditingCategory(null)
-      setHasChanges(true)
       fetchData()
     } catch (err) {
       console.error("Error saving category:", err)
@@ -255,24 +253,12 @@ export default function Catalog() {
         is_available: data.p_is_available,
       })
       setEditingProduct(null)
-      setHasChanges(true)
       fetchData()
     } catch (err) {
       console.error("Error saving product:", err)
     }
   }
 
-  const handleFinishEditing = () => {
-    setIsEditing(false)
-    setHasChanges(false)
-  }
-
-  const handleCancelEditing = () => {
-    setIsEditing(false)
-    setHasChanges(false)
-    // Recarrega os dados para descartar alterações não salvas
-    fetchData()
-  }
 
   const handleCreateCategory = async (data: Record<string, any>) => {
     try {
@@ -282,7 +268,6 @@ export default function Catalog() {
         image_url: data.c_image_url,
       })
       setCreatingCategory(false)
-      setHasChanges(true)
       fetchData()
     } catch (err) {
       console.error("Error creating category:", err)
@@ -299,9 +284,9 @@ export default function Catalog() {
         price: Number(data.p_price),
         image_url: data.p_image_url,
         category_id: creatingProductForCategory,
+        is_available: data.p_is_available,
       })
       setCreatingProductForCategory(null)
-      setHasChanges(true)
       fetchData()
     } catch (err) {
       console.error("Error creating product:", err)
@@ -322,7 +307,6 @@ export default function Catalog() {
     try {
       await categoriesApi.delete(deletingCategoryId)
       setDeletingCategoryId(null)
-      setHasChanges(true)
       fetchData()
     } catch (err) {
       console.error("Error deleting category:", err)
@@ -406,9 +390,6 @@ export default function Catalog() {
         <FloatingEditButton
           isEditing={isEditing}
           onToggleEdit={() => setIsEditing(!isEditing)}
-          hasChanges={hasChanges}
-          onSave={handleFinishEditing}
-          onCancel={handleCancelEditing}
         />
       )}
 
@@ -436,7 +417,6 @@ export default function Catalog() {
             { key: "p_name", label: "Nome", type: "text", value: editingProduct.p_name },
             { key: "p_description", label: "Descrição", type: "textarea", value: editingProduct.p_description || "" },
             { key: "p_price", label: "Preço", type: "number", value: editingProduct.p_price },
-            { key: "p_image_url", label: "URL da Imagem", type: "text", value: editingProduct.p_image_url || "" },
             {
               key: "p_is_available",
               label: "Disponível",
@@ -470,7 +450,7 @@ export default function Catalog() {
           fields={[
             { key: "p_name", label: "Nome", type: "text", value: "" },
             { key: "p_description", label: "Descrição", type: "textarea", value: "" },
-            { key: "p_price", label: "Preço", type: "number", value: 0 },
+            { key: "p_price", label: "Preço", type: "currency", value: "", required: true, placeholder: "0,00" },
             { key: "p_image_url", label: "URL da Imagem", type: "text", value: "" },
             { key: "p_is_available", label: "Disponível", type: "checkbox", value: true },
           ]}

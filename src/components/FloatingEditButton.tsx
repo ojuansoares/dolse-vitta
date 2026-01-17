@@ -1,21 +1,12 @@
-import { Pencil, Check, X } from "lucide-react"
+import { Pencil, Check } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface FloatingEditButtonProps {
-  isEditing: boolean
-  onToggleEdit: () => void
-  onSave?: () => void
-  onCancel?: () => void
-  hasChanges?: boolean
+  isEditing: boolean;
+  onToggleEdit: () => void;
 }
 
-export default function FloatingEditButton({
-  isEditing,
-  onToggleEdit,
-  onSave,
-  onCancel,
-  hasChanges,
-}: FloatingEditButtonProps) {
+export default function FloatingEditButton({ isEditing, onToggleEdit }: FloatingEditButtonProps) {
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
       {isEditing ? (

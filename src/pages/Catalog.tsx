@@ -36,7 +36,6 @@ export default function Catalog() {
 
   // Admin editing state
   const [isEditing, setIsEditing] = useState(false)
-  const [hasChanges, setHasChanges] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
 
@@ -101,7 +100,6 @@ export default function Catalog() {
         image_url: data.c_image_url,
       })
       setEditingCategory(null)
-      setHasChanges(true)
       fetchData()
     } catch (err) {
       console.error("Error saving category:", err)
@@ -120,17 +118,12 @@ export default function Catalog() {
         is_available: data.p_is_available,
       })
       setEditingProduct(null)
-      setHasChanges(true)
       fetchData()
     } catch (err) {
       console.error("Error saving product:", err)
     }
   }
 
-  const handleFinishEditing = () => {
-    setIsEditing(false)
-    setHasChanges(false)
-  }
 
   if (loading) {
     return (
@@ -193,8 +186,6 @@ export default function Catalog() {
         <FloatingEditButton
           isEditing={isEditing}
           onToggleEdit={() => setIsEditing(!isEditing)}
-          hasChanges={hasChanges}
-          onSave={handleFinishEditing}
         />
       )}
 

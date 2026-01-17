@@ -185,8 +185,15 @@ async def delete_category(request: Request, category_id: str):
     try:
         get_current_user(request)
         supabase = get_supabase_admin_client()
-        supabase.table("category").delete().eq("id", category_id).execute()
-        return JSONResponse(content={"success": True, "message": "Category deleted!"})
+        # Delete all products linked to this category and check result
+        prod_del = supabase.table("product").delete().eq("p_category_id", category_id).execute()
+        if hasattr(prod_del, "error") and prod_del.error:
+            raise HTTPException(status_code=400, detail=f"Erro ao apagar produtos: {prod_del.error}")
+        # Now delete the category itself
+        cat_del = supabase.table("category").delete().eq("id", category_id).execute()
+        if hasattr(cat_del, "error") and cat_del.error:
+            raise HTTPException(status_code=400, detail=f"Erro ao apagar categoria: {cat_del.error}")
+        return JSONResponse(content={"success": True, "message": "Category and its products deleted!"})
     except HTTPException:
         raise
     except Exception as e:

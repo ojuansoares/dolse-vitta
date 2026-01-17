@@ -86,6 +86,7 @@ export const productsApi = {
     price: number
     category_id?: string
     image_url?: string
+    is_available?: boolean
   }) =>
     fetchWithAuth(`${API_URL}/products`, {
       method: "POST",

@@ -7,9 +7,10 @@ import { cn } from "@/lib/utils"
 interface Field {
   key: string
   label: string
-  type: "text" | "textarea" | "number" | "checkbox" | "email" | "phone" | "url" | "instagram"
+  type: "text" | "textarea" | "number" | "checkbox" | "email" | "phone" | "url" | "instagram" | "currency"
   value: string | number | boolean
   placeholder?: string
+  required?: boolean
 }
 
 interface EditModalProps {
@@ -82,15 +83,30 @@ export default function EditModal({ title, onClose, onSave, fields }: EditModalP
     setFormData(initial)
   }, [fields])
 
+  // Format currency as 0,00 and allow only numbers
+  const formatCurrency = (value: string): string => {
+    const numbers = value.replace(/\D/g, "")
+    if (!numbers) return ""
+    const cents = numbers.padStart(3, "0")
+    const intPart = cents.slice(0, -2)
+    const decimalPart = cents.slice(-2)
+    return `${parseInt(intPart, 10)},${decimalPart}`.replace(/^0+(?!,)/, "")
+  }
+
+  const parseCurrency = (value: string): number => {
+    if (!value) return 0
+    return parseFloat(value.replace(/\./g, "").replace(",", "."))
+  }
+
   const handleChange = (key: string, value: string | number | boolean, fieldType?: string) => {
-    // Apply phone mask if it's a phone field
     let processedValue = value
     if (fieldType === 'phone' && typeof value === 'string') {
       processedValue = formatPhone(value)
     }
-    
+    if (fieldType === 'currency' && typeof value === 'string') {
+      processedValue = formatCurrency(value)
+    }
     setFormData((prev) => ({ ...prev, [key]: processedValue }))
-    // Clear error when user types
     if (errors[key]) {
       setErrors((prev) => ({ ...prev, [key]: "" }))
     }
@@ -99,6 +115,9 @@ export default function EditModal({ title, onClose, onSave, fields }: EditModalP
   const validateField = (field: Field, value: string | number | boolean): string => {
     const strValue = String(value || "")
     
+    if (field.required && (strValue === "" || strValue === undefined || strValue === null)) {
+      return "Campo obrigatório"
+    }
     switch (field.type) {
       case "email":
         if (!validateEmail(strValue)) return "Email inválido"
@@ -118,11 +137,9 @@ export default function EditModal({ title, onClose, onSave, fields }: EditModalP
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    
     // Validate all fields
     const newErrors: Record<string, string> = {}
     let hasErrors = false
-    
     fields.forEach((field) => {
       const error = validateField(field, formData[field.key])
       if (error) {
@@ -130,13 +147,18 @@ export default function EditModal({ title, onClose, onSave, fields }: EditModalP
         hasErrors = true
       }
     })
-    
     if (hasErrors) {
       setErrors(newErrors)
       return
     }
-    
-    onSave(formData)
+    // Convert currency field to number before saving
+    const dataToSave = { ...formData }
+    fields.forEach((field) => {
+      if (field.type === 'currency') {
+        dataToSave[field.key] = parseCurrency(formData[field.key] as string)
+      }
+    })
+    onSave(dataToSave)
   }
 
   return (
@@ -181,6 +203,20 @@ export default function EditModal({ title, onClose, onSave, fields }: EditModalP
                   />
                   <span className="text-sm text-muted-foreground">Ativo</span>
                 </label>
+              ) : field.type === "currency" ? (
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={formData[field.key] as string}
+                  onChange={(e) => handleChange(field.key, e.target.value, field.type)}
+                  placeholder={field.placeholder || "0,00"}
+                  className={cn(
+                    "w-full px-4 py-3 rounded-xl border bg-cream-50",
+                    "focus:outline-none focus:ring-2 focus:ring-brown-500/30 focus:border-brown-500",
+                    "transition-all duration-300",
+                    errors[field.key] ? "border-red-400 focus:ring-red-500/30 focus:border-red-500" : "border-border",
+                  )}
+                />
               ) : (
                 <input
                   type={field.type === "email" ? "email" : field.type === "phone" ? "tel" : field.type === "url" ? "url" : field.type === "instagram" ? "text" : field.type}
