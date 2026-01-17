@@ -50,28 +50,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    // Check current session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session)
-      setUser(session?.user ?? null)
-      
-      if (session?.user) {
-        const profile = await fetchAdminProfile(session.user.id)
-        setAdminProfile(profile)
-      }
-      
-      setLoading(false)
-    })
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+    let isMounted = true
+    
+    // Check current session with timeout
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        
+        if (!isMounted) return
+        
         setSession(session)
         setUser(session?.user ?? null)
         
         if (session?.user) {
           const profile = await fetchAdminProfile(session.user.id)
-          setAdminProfile(profile)
+          if (isMounted) setAdminProfile(profile)
+        }
+      } catch (err) {
+        console.error('Error checking session:', err)
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+    
+    // Timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      if (isMounted && loading) {
+        console.warn('Auth check timeout - forcing loading to false')
+        setLoading(false)
+      }
+    }, 5000)
+    
+    checkSession()
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        if (!isMounted) return
+        
+        setSession(session)
+        setUser(session?.user ?? null)
+        
+        if (session?.user) {
+          const profile = await fetchAdminProfile(session.user.id)
+          if (isMounted) setAdminProfile(profile)
         } else {
           setAdminProfile(null)
         }
@@ -80,7 +102,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     )
 
-    return () => subscription.unsubscribe()
+    return () => {
+      isMounted = false
+      clearTimeout(timeout)
+      subscription.unsubscribe()
+    }
   }, [])
 
   const signIn = async (email: string, password: string) => {

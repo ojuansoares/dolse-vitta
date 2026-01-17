@@ -14,12 +14,8 @@
     }
   ],
   "routes": [
-    { "src": "/api/auth/register", "dest": "/api/auth/register.py" },
-    { "src": "/api/auth/login", "dest": "/api/auth/login.py" },
-    { "src": "/api/auth/logout", "dest": "/api/auth/logout.py" },
-    { "src": "/api/auth/me", "dest": "/api/auth/me.py" },
-    { "src": "/api/users/profile", "dest": "/api/users/profile.py" },
-    { "src": "/api/users/account", "dest": "/api/users/account.py" },
+    { "src": "/api/auth/(.*)", "dest": "/api/auth.py" },
+    { "src": "/api/users/(.*)", "dest": "/api/users.py" },
     { "src": "/api/products/([^/]+)", "dest": "/api/products/[id].py?product_id=$1" },
     { "src": "/api/products", "dest": "/api/products/index.py" },
     { "src": "/api/categories", "dest": "/api/categories/index.py" },
