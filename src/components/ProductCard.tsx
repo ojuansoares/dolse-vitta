@@ -69,7 +69,7 @@ export default function ProductCard({ product, isEditing, onEdit }: ProductCardP
     <>
       {/* Product Details Modal */}
       <Dialog open={showDetails} onOpenChange={setShowDetails}>
-        <DialogContent className="bg-cream-50 max-w-md mx-4 p-0 overflow-hidden">
+        <DialogContent className="bg-cream-50 max-w-md w-[calc(100%-2rem)] left-1/2 -translate-x-1/2 p-0 overflow-hidden rounded-2xl">
           {/* Image */}
           <div className="relative aspect-video overflow-hidden bg-cream-100">
             {product.p_image_url ? (
