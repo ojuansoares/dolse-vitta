@@ -176,9 +176,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut()
-    if (error) throw error
+    try {
+      // Try normal signout first
+      await supabase.auth.signOut()
+    } catch (err) {
+      console.error('SignOut error (continuing anyway):', err)
+    }
+    
+    // Force clear all auth data
+    setUser(null)
+    setSession(null)
     setAdminProfile(null)
+    
+    // Clear all Supabase related storage
+    const keysToRemove: string[] = []
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (key && (key.includes('supabase') || key.includes('dolce-vitta') || key.includes('sb-'))) {
+        keysToRemove.push(key)
+      }
+    }
+    keysToRemove.forEach(key => localStorage.removeItem(key))
+    
+    // Clear sessionStorage too
+    const sessionKeysToRemove: string[] = []
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const key = sessionStorage.key(i)
+      if (key && (key.includes('supabase') || key.includes('dolce-vitta') || key.includes('sb-'))) {
+        sessionKeysToRemove.push(key)
+      }
+    }
+    sessionKeysToRemove.forEach(key => sessionStorage.removeItem(key))
+    
+    console.log('Logout complete - all auth data cleared')
+    
+    // Force reload to clean state
+    window.location.href = '/login'
   }
 
   const value = {
