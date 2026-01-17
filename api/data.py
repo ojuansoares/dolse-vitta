@@ -77,11 +77,11 @@ async def list_categories(request: Request):
         for c in response.data:
             categories.append({
                 "id": c["id"],
-                "name": c["c_name"],
-                "description": c["c_description"],
-                "image_url": c["c_image_url"],
-                "is_active": c["c_is_active"],
-                "sort_order": c["c_sort_order"]
+                "c_name": c["c_name"],
+                "c_description": c["c_description"],
+                "c_image_url": c["c_image_url"],
+                "c_is_active": c["c_is_active"],
+                "c_sort_order": c["c_sort_order"]
             })
         
         return JSONResponse(content={"success": True, "categories": categories})
@@ -132,11 +132,11 @@ async def get_category(request: Request, category_id: str):
             "success": True,
             "category": {
                 "id": c["id"],
-                "name": c["c_name"],
-                "description": c["c_description"],
-                "image_url": c["c_image_url"],
-                "is_active": c["c_is_active"],
-                "sort_order": c["c_sort_order"]
+                "c_name": c["c_name"],
+                "c_description": c["c_description"],
+                "c_image_url": c["c_image_url"],
+                "c_is_active": c["c_is_active"],
+                "c_sort_order": c["c_sort_order"]
             }
         })
     except HTTPException:
@@ -206,13 +206,14 @@ async def list_products(request: Request):
         for p in response.data:
             products.append({
                 "id": p["id"],
-                "name": p["p_name"],
-                "description": p["p_description"],
-                "price": float(p["p_price"]) if p["p_price"] else 0,
-                "image_url": p["p_image_url"],
-                "is_available": p["p_is_available"],
-                "is_featured": p["p_is_featured"],
-                "category_id": p["p_category_id"],
+                "p_name": p["p_name"],
+                "p_description": p["p_description"],
+                "p_price": float(p["p_price"]) if p["p_price"] else 0,
+                "p_image_url": p["p_image_url"],
+                "p_is_available": p["p_is_available"],
+                "p_is_featured": p["p_is_featured"],
+                "p_category_id": p["p_category_id"],
+                "p_sort_order": p.get("p_sort_order", 0),
                 "category_name": p["category"]["c_name"] if p.get("category") else None
             })
         
@@ -267,13 +268,14 @@ async def get_product(request: Request, product_id: str):
             "success": True,
             "product": {
                 "id": p["id"],
-                "name": p["p_name"],
-                "description": p["p_description"],
-                "price": float(p["p_price"]) if p["p_price"] else 0,
-                "image_url": p["p_image_url"],
-                "is_available": p["p_is_available"],
-                "is_featured": p["p_is_featured"],
-                "category_id": p["p_category_id"],
+                "p_name": p["p_name"],
+                "p_description": p["p_description"],
+                "p_price": float(p["p_price"]) if p["p_price"] else 0,
+                "p_image_url": p["p_image_url"],
+                "p_is_available": p["p_is_available"],
+                "p_is_featured": p["p_is_featured"],
+                "p_category_id": p["p_category_id"],
+                "p_sort_order": p.get("p_sort_order", 0),
                 "category_name": p["category"]["c_name"] if p.get("category") else None
             }
         })

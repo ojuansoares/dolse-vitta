@@ -96,11 +96,19 @@ export default function Navbar() {
                 </Link>
               )}
 
-              {/* Admin indicator */}
+              {/* Admin indicator + Logout (Desktop) */}
               {user && (
-                <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-brown-500/10 text-brown-600">
-                  <User className="w-4 h-4" />
-                  <span className="text-sm font-medium">Admin</span>
+                <div className="hidden md:flex items-center gap-2">
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-brown-500/10 text-brown-600">
+                    <User className="w-4 h-4" />
+                    <span className="text-sm font-medium">Admin</span>
+                  </div>
+                  <button
+                    onClick={() => signOut()}
+                    className="px-3 py-1.5 rounded-full text-sm font-medium bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-all duration-300"
+                  >
+                    Sair
+                  </button>
                 </div>
               )}
 
