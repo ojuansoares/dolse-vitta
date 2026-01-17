@@ -4,24 +4,45 @@ const API_URL = '/api'
 
 // Helper for authenticated requests
 async function fetchWithAuth(url: string, options: RequestInit = {}) {
-  const { data: { session } } = await supabase.auth.getSession()
-  
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
+  try {
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+    
+    if (sessionError) {
+      console.error('Session error:', sessionError)
+    }
+    
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    }
+    
+    if (session?.access_token) {
+      headers['Authorization'] = `Bearer ${session.access_token}`
+    } else {
+      console.warn('No access token available for request:', url)
+    }
+    
+    const response = await fetch(url, { ...options, headers })
+    
+    // Handle non-JSON responses
+    const contentType = response.headers.get('content-type')
+    if (!contentType || !contentType.includes('application/json')) {
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+      return { success: true }
+    }
+    
+    const data = await response.json()
+    
+    if (!response.ok) {
+      throw new Error(data.detail || data.message || 'Request error')
+    }
+    
+    return data
+  } catch (err) {
+    console.error('API request failed:', url, err)
+    throw err
   }
-  
-  if (session?.access_token) {
-    headers['Authorization'] = `Bearer ${session.access_token}`
-  }
-  
-  const response = await fetch(url, { ...options, headers })
-  const data = await response.json()
-  
-  if (!response.ok) {
-    throw new Error(data.detail || 'Request error')
-  }
-  
-  return data
 }
 
 // Products API (items for sale)

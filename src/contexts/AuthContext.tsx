@@ -55,7 +55,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Check current session with timeout
     const checkSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession()
+        console.log('Checking session...')
+        const { data: { session }, error } = await supabase.auth.getSession()
+        
+        if (error) {
+          console.error('Session error:', error)
+        }
+        
+        console.log('Session found:', session ? 'Yes' : 'No', session?.user?.email)
         
         if (!isMounted) return
         
@@ -63,13 +70,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null)
         
         if (session?.user) {
+          console.log('Fetching admin profile...')
           const profile = await fetchAdminProfile(session.user.id)
+          console.log('Admin profile:', profile?.a_email)
           if (isMounted) setAdminProfile(profile)
+        } else {
+          if (isMounted) setAdminProfile(null)
         }
       } catch (err) {
         console.error('Error checking session:', err)
       } finally {
-        if (isMounted) setLoading(false)
+        if (isMounted) {
+          console.log('Auth check complete, setting loading to false')
+          setLoading(false)
+        }
       }
     }
     
@@ -85,7 +99,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email)
         if (!isMounted) return
         
         setSession(session)
