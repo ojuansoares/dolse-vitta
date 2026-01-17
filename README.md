@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="public/favicon.png" alt="Dolce Vitta Logo" width="120" />
-</p>
-
 <h1 align="center">🍰 Dolce Vitta</h1>
 
 <p align="center">
@@ -10,9 +6,8 @@
 
 <p align="center">
   <!-- Espaço reservado para GIF de demonstração -->
-  <img src="" alt="Demo GIF" width="600" />
+  <img src="" alt="GIF" width="600" />
   <br>
-  <em>📍 Adicione aqui um GIF de demonstração do sistema</em>
 </p>
 
 <p align="center">
