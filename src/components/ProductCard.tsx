@@ -84,10 +84,15 @@ export default function ProductCard({ product, isEditing, onEdit }: ProductCardP
               </div>
             )}
             {!product.p_is_available && (
-              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+              <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-2">
                 <span className="px-4 py-2 rounded-full bg-white/90 text-sm font-medium">
                   Indisponível
                 </span>
+                {user && (
+                  <span className="text-xs text-white/80">
+                    Só o admin pode ver este item
+                  </span>
+                )}
               </div>
             )}
           </div>
@@ -155,6 +160,7 @@ export default function ProductCard({ product, isEditing, onEdit }: ProductCardP
           "group relative glass-card rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer",
           "hover:shadow-xl hover:shadow-brown-500/10 hover:-translate-y-1",
           isEditing && "ring-2 ring-brown-500/30",
+          !product.p_is_available && user && "opacity-60 grayscale-[30%]",
         )}
       >
         {/* Drag handle for admin */}
@@ -188,11 +194,14 @@ export default function ProductCard({ product, isEditing, onEdit }: ProductCardP
           </div>
         )}
 
-        {/* Unavailable overlay */}
-        {!product.p_is_available && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+        {/* Unavailable overlay - only visible to admin */}
+        {!product.p_is_available && user && (
+          <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center gap-1">
             <span className="px-3 py-1.5 rounded-full bg-white/90 text-sm font-medium text-foreground">
               Indisponível
+            </span>
+            <span className="text-xs text-white/90">
+              Só você pode ver
             </span>
           </div>
         )}

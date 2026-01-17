@@ -144,6 +144,10 @@ export const categoriesApi = {
       method: "PUT",
       body: JSON.stringify({ items: categories }),
     }),
+  delete: (id: string) =>
+    fetchWithAuth(`${API_URL}/categories/${id}`, {
+      method: "DELETE",
+    }),
 }
 
 // Orders API

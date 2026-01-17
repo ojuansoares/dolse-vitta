@@ -227,7 +227,7 @@ async def update_profile(request: Request):
 @app.get("/api/products")
 async def list_products():
     supabase = get_supabase_client()
-    response = supabase.table("product").select("*").eq("p_is_available", True).order("p_sort_order").execute()
+    response = supabase.table("product").select("*").order("p_sort_order").execute()
     
     products = [{
         "id": p["id"],
@@ -237,7 +237,7 @@ async def list_products():
         "p_image_url": p["p_image_url"],
         "p_category_id": p["p_category_id"],
         "p_sort_order": p.get("p_sort_order", 0),
-        "p_is_available": p.get("p_is_available", True),
+        "p_is_available": p.get("p_is_available"),
     } for p in response.data]
     
     return {"success": True, "products": products}

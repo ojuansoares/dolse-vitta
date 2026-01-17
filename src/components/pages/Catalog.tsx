@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { Plus } from "lucide-react"
 import { categoriesApi, productsApi } from "@/services/api"
 import { useAuth } from "@/hooks/useAuth"
 import CategorySection from "@/components/CategorySection"
@@ -37,6 +38,9 @@ export default function Catalog() {
   const [hasChanges, setHasChanges] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+  const [creatingCategory, setCreatingCategory] = useState(false)
+  const [creatingProductForCategory, setCreatingProductForCategory] = useState<string | null>(null)
+  const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null)
 
   useEffect(() => {
     fetchData()
@@ -263,6 +267,68 @@ export default function Catalog() {
     setHasChanges(false)
   }
 
+  const handleCancelEditing = () => {
+    setIsEditing(false)
+    setHasChanges(false)
+    // Recarrega os dados para descartar alterações não salvas
+    fetchData()
+  }
+
+  const handleCreateCategory = async (data: Record<string, any>) => {
+    try {
+      await categoriesApi.create({
+        name: data.c_name,
+        description: data.c_description,
+        image_url: data.c_image_url,
+      })
+      setCreatingCategory(false)
+      setHasChanges(true)
+      fetchData()
+    } catch (err) {
+      console.error("Error creating category:", err)
+    }
+  }
+
+  const handleCreateProduct = async (data: Record<string, any>) => {
+    if (!creatingProductForCategory) return
+
+    try {
+      await productsApi.create({
+        name: data.p_name,
+        description: data.p_description,
+        price: Number(data.p_price),
+        image_url: data.p_image_url,
+        category_id: creatingProductForCategory,
+      })
+      setCreatingProductForCategory(null)
+      setHasChanges(true)
+      fetchData()
+    } catch (err) {
+      console.error("Error creating product:", err)
+    }
+  }
+
+  const handleAddProduct = (categoryId: string) => {
+    setCreatingProductForCategory(categoryId)
+  }
+
+  const handleDeleteCategory = (categoryId: string) => {
+    setDeletingCategoryId(categoryId)
+  }
+
+  const confirmDeleteCategory = async () => {
+    if (!deletingCategoryId) return
+
+    try {
+      await categoriesApi.delete(deletingCategoryId)
+      setDeletingCategoryId(null)
+      setHasChanges(true)
+      fetchData()
+    } catch (err) {
+      console.error("Error deleting category:", err)
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -300,6 +366,19 @@ export default function Catalog() {
         </p>
       </header>
 
+      {/* Add Category Button (only in edit mode) */}
+      {isEditing && (
+        <div className="mb-8">
+          <button
+            onClick={() => setCreatingCategory(true)}
+            className="flex items-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-brown-300 text-brown-600 hover:bg-brown-50 hover:border-brown-400 transition-all duration-300 w-full justify-center"
+          >
+            <Plus className="w-5 h-5" />
+            <span className="font-medium">Adicionar Categoria</span>
+          </button>
+        </div>
+      )}
+
       {/* Categories */}
       <div className="space-y-12">
         {categories.length > 0 ? (
@@ -308,8 +387,11 @@ export default function Catalog() {
               key={category.id}
               category={category}
               isEditing={isEditing}
+              isAdmin={!!user}
               onEditCategory={handleEditCategory}
               onEditProduct={handleEditProduct}
+              onAddProduct={handleAddProduct}
+              onDeleteCategory={handleDeleteCategory}
             />
           ))
         ) : (
@@ -326,6 +408,7 @@ export default function Catalog() {
           onToggleEdit={() => setIsEditing(!isEditing)}
           hasChanges={hasChanges}
           onSave={handleFinishEditing}
+          onCancel={handleCancelEditing}
         />
       )}
 
@@ -362,6 +445,62 @@ export default function Catalog() {
             },
           ]}
         />
+      )}
+
+      {/* Create Category Modal */}
+      {creatingCategory && (
+        <EditModal
+          title="Nova Categoria"
+          onClose={() => setCreatingCategory(false)}
+          onSave={handleCreateCategory}
+          fields={[
+            { key: "c_name", label: "Nome", type: "text", value: "" },
+            { key: "c_description", label: "Descrição", type: "textarea", value: "" },
+            { key: "c_image_url", label: "URL da Imagem", type: "text", value: "" },
+          ]}
+        />
+      )}
+
+      {/* Create Product Modal */}
+      {creatingProductForCategory && (
+        <EditModal
+          title="Novo Produto"
+          onClose={() => setCreatingProductForCategory(null)}
+          onSave={handleCreateProduct}
+          fields={[
+            { key: "p_name", label: "Nome", type: "text", value: "" },
+            { key: "p_description", label: "Descrição", type: "textarea", value: "" },
+            { key: "p_price", label: "Preço", type: "number", value: 0 },
+            { key: "p_image_url", label: "URL da Imagem", type: "text", value: "" },
+            { key: "p_is_available", label: "Disponível", type: "checkbox", value: true },
+          ]}
+        />
+      )}
+
+      {/* Delete Category Confirmation Modal */}
+      {deletingCategoryId && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
+            <h2 className="text-xl font-serif font-bold text-foreground mb-4">Excluir Categoria</h2>
+            <p className="text-muted-foreground mb-6">
+              Tem certeza que deseja excluir esta categoria? <strong className="text-red-600">Todos os produtos desta categoria serão excluídos permanentemente.</strong>
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setDeletingCategoryId(null)}
+                className="px-4 py-2 rounded-xl border border-brown-300 text-brown-600 hover:bg-brown-50 transition-all duration-300"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmDeleteCategory}
+                className="px-4 py-2 rounded-xl bg-red-600 text-white hover:bg-red-700 transition-all duration-300"
+              >
+                Excluir Categoria
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </main>
   )

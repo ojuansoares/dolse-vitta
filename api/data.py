@@ -197,10 +197,10 @@ async def delete_category(request: Request, category_id: str):
 
 @app.get("/api/products")
 async def list_products(request: Request):
-    """List all available products (public)"""
+    """List all products (public) - filtering done on frontend"""
     try:
         supabase = get_supabase_client()
-        response = supabase.table("product").select("*, category(c_name)").eq("p_is_available", True).order("p_sort_order").execute()
+        response = supabase.table("product").select("*, category(c_name)").order("p_sort_order").execute()
         
         products = []
         for p in response.data:
