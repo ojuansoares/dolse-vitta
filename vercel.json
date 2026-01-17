@@ -21,6 +21,8 @@
     { "src": "/api/categories", "dest": "/api/categories/index.py" },
     { "src": "/api/orders", "dest": "/api/orders/index.py" },
     { "src": "/api/?", "dest": "/api/index.py" },
-    { "src": "/(.*)", "dest": "/$1" }
+    { "src": "/assets/(.*)", "dest": "/assets/$1" },
+    { "src": "/(.*\\.(js|css|ico|png|jpg|jpeg|svg|woff|woff2))", "dest": "/$1" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
