@@ -52,52 +52,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let isMounted = true
     
-    // Check current session with timeout
-    const checkSession = async () => {
-      try {
-        console.log('Checking session...')
-        const { data: { session }, error } = await supabase.auth.getSession()
-        
-        if (error) {
-          console.error('Session error:', error)
-        }
-        
-        console.log('Session found:', session ? 'Yes' : 'No', session?.user?.email)
-        
-        if (!isMounted) return
-        
-        setSession(session)
-        setUser(session?.user ?? null)
-        
-        if (session?.user) {
-          console.log('Fetching admin profile...')
-          const profile = await fetchAdminProfile(session.user.id)
-          console.log('Admin profile:', profile?.a_email)
-          if (isMounted) setAdminProfile(profile)
-        } else {
-          if (isMounted) setAdminProfile(null)
-        }
-      } catch (err) {
-        console.error('Error checking session:', err)
-      } finally {
-        if (isMounted) {
-          console.log('Auth check complete, setting loading to false')
-          setLoading(false)
-        }
-      }
-    }
+    console.log('AuthProvider mounting...')
     
-    // Timeout to prevent infinite loading
-    const timeout = setTimeout(() => {
-      if (isMounted && loading) {
-        console.warn('Auth check timeout - forcing loading to false')
-        setLoading(false)
-      }
-    }, 5000)
-    
-    checkSession()
-
-    // Listen for auth changes
+    // Set up auth state listener FIRST - this is the reliable way
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.email)
@@ -107,19 +64,67 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null)
         
         if (session?.user) {
-          const profile = await fetchAdminProfile(session.user.id)
-          if (isMounted) setAdminProfile(profile)
+          // Use setTimeout to avoid potential race conditions
+          setTimeout(async () => {
+            if (!isMounted) return
+            const profile = await fetchAdminProfile(session.user.id)
+            if (isMounted) setAdminProfile(profile)
+            setLoading(false)
+          }, 0)
         } else {
           setAdminProfile(null)
+          setLoading(false)
         }
-        
-        setLoading(false)
       }
     )
+    
+    // Then check for existing session (but don't block on it)
+    const checkSession = async () => {
+      try {
+        console.log('Checking initial session...')
+        const { data: { session }, error } = await supabase.auth.getSession()
+        
+        if (error) {
+          console.error('Initial session error:', error)
+          if (isMounted) setLoading(false)
+          return
+        }
+        
+        console.log('Initial session:', session ? session.user?.email : 'None')
+        
+        // Only set if we haven't received an auth state change yet
+        if (isMounted && loading) {
+          setSession(session)
+          setUser(session?.user ?? null)
+          
+          if (session?.user) {
+            const profile = await fetchAdminProfile(session.user.id)
+            if (isMounted) setAdminProfile(profile)
+          }
+          
+          setLoading(false)
+        }
+      } catch (err) {
+        console.error('Error checking initial session:', err)
+        if (isMounted) setLoading(false)
+      }
+    }
+    
+    // Small delay before checking session to let onAuthStateChange fire first
+    const sessionTimeout = setTimeout(checkSession, 100)
+    
+    // Fallback timeout in case everything fails
+    const fallbackTimeout = setTimeout(() => {
+      if (isMounted && loading) {
+        console.warn('Auth fallback timeout - forcing loading to false')
+        setLoading(false)
+      }
+    }, 3000)
 
     return () => {
       isMounted = false
-      clearTimeout(timeout)
+      clearTimeout(sessionTimeout)
+      clearTimeout(fallbackTimeout)
       subscription.unsubscribe()
     }
   }, [])
@@ -166,8 +171,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       if (insertError) {
         console.error('Error creating admin profile:', insertError)
-        // Note: User was created in auth but admin profile failed
-        // This should be handled by backend as fallback
       }
     }
   }
