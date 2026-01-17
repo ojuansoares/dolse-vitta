@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Plus, Minus, GripVertical, Pencil, X } from "lucide-react"
+import { Plus, Minus, GripVertical, Pencil } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
 import { useAuth } from "@/hooks/useAuth"
 import { cn } from "@/lib/utils"
