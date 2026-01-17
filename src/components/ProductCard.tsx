@@ -106,12 +106,12 @@ export default function ProductCard({ product, isEditing, onEdit }: ProductCardP
           <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{product.p_description}</p>
         )}
 
-        <div className="mt-3 flex items-center justify-between">
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
           <span className="font-semibold text-brown-600">{formatPrice(product.p_price)}</span>
 
           {/* Add to cart - only for non-admin users */}
           {!user && product.p_is_available !== false && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-shrink-0">
               {quantity > 0 ? (
                 <div className="flex items-center gap-1 bg-brown-500/10 rounded-full">
                   <button
