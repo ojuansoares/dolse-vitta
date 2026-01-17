@@ -62,13 +62,23 @@ export default function OrderHistory() {
   }
 
   const formatDate = (dateString: string) => {
-    return new Intl.DateTimeFormat("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(new Date(dateString))
+    if (!dateString) return "Data não disponível"
+    
+    try {
+      const date = new Date(dateString)
+      if (isNaN(date.getTime())) {
+        return "Data inválida"
+      }
+      return new Intl.DateTimeFormat("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(date)
+    } catch {
+      return "Data inválida"
+    }
   }
 
   const handleDeleteAll = async () => {

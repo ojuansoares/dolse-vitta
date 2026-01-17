@@ -353,11 +353,11 @@ async def list_orders(request: Request):
         for o in response.data:
             orders.append({
                 "id": o["id"],
-                "customer_name": o["o_customer_name"],
-                "customer_order": o["o_customer_order"],
-                "total": float(o["o_total"]) if o["o_total"] else 0,
-                "created_at": o["o_created_at"],
-                "items": o.get("order_item", [])
+                "o_customer_name": o["o_customer_name"],
+                "o_customer_order": o["o_customer_order"],
+                "o_total": float(o["o_total"]) if o["o_total"] else 0,
+                "o_created_at": o["o_created_at"],
+                "order_item": o.get("order_item", [])
             })
         
         return JSONResponse(content={"success": True, "orders": orders})
