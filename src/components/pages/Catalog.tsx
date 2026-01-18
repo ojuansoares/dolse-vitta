@@ -403,7 +403,7 @@ export default function Catalog() {
             { key: "c_name", label: "Nome", type: "text", value: editingCategory.c_name },
             { key: "c_description", label: "Descrição", type: "textarea", value: editingCategory.c_description || "" },
             // ...campo de URL removido...
-            { key: "p_image_url", label: "URL da Imagem", type: "text", value: editingProduct.p_image_url || "" },
+            { key: "p_image_url", label: "URL da Imagem", type: "text", value: editingProduct?.p_image_url || "" },
           ]}
         />
       )}
