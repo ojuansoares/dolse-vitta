@@ -402,7 +402,8 @@ export default function Catalog() {
           fields={[
             { key: "c_name", label: "Nome", type: "text", value: editingCategory.c_name },
             { key: "c_description", label: "Descrição", type: "textarea", value: editingCategory.c_description || "" },
-            { key: "c_image_url", label: "URL da Imagem", type: "text", value: editingCategory.c_image_url || "" },
+            // ...campo de URL removido...
+            { key: "p_image_url", label: "URL da Imagem", type: "text", value: editingProduct.p_image_url || "" },
           ]}
         />
       )}
@@ -436,7 +437,7 @@ export default function Catalog() {
           fields={[
             { key: "c_name", label: "Nome", type: "text", value: "" },
             { key: "c_description", label: "Descrição", type: "textarea", value: "" },
-            { key: "c_image_url", label: "URL da Imagem", type: "text", value: "" },
+            // ...campo de URL removido...
           ]}
         />
       )}
