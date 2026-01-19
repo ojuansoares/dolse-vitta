@@ -18,6 +18,7 @@ interface EditModalProps {
   onClose: () => void
   onSave: (data: Record<string, string | number | boolean>) => void
   fields: Field[]
+  extraActions?: React.ReactNode
 }
 
 // Validation functions
@@ -71,7 +72,7 @@ const validateInstagram = (instagram: string): boolean => {
   return instagram.startsWith('@')
 }
 
-export default function EditModal({ title, onClose, onSave, fields }: EditModalProps) {
+export default function EditModal({ title, onClose, onSave, fields, extraActions }: EditModalProps) {
   const [formData, setFormData] = useState<Record<string, string | number | boolean>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -274,6 +275,7 @@ export default function EditModal({ title, onClose, onSave, fields }: EditModalP
               Salvar
             </button>
           </div>
+          {extraActions && <div>{extraActions}</div>}
         </form>
       </div>
     </div>

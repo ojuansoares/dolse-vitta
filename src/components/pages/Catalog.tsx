@@ -33,6 +33,20 @@ export default function Catalog() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  const [showDeleteProductModal, setShowDeleteProductModal] = useState(false);
+
+  const handleDeleteProduct = async () => {
+    if (!editingProduct) return;
+    try {
+      await productsApi.delete(editingProduct.id);
+      setShowDeleteProductModal(false);
+      setEditingProduct(null);
+      fetchData();
+    } catch (err) {
+      console.error("Error deleting product:", err);
+    }
+  };
+
   // Admin editing state
   const [isEditing, setIsEditing] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
@@ -425,7 +439,41 @@ export default function Catalog() {
               value: editingProduct.p_is_available ?? true,
             },
           ]}
+          extraActions={
+            <button
+              className="w-full mt-4 py-3 rounded-xl bg-red-500 text-white font-medium hover:bg-red-600 transition-all duration-300"
+              onClick={() => setShowDeleteProductModal(true)}
+              type="button"
+            >
+              Remover Produto
+            </button>
+          }
         />
+      )}
+
+      {/* Modal de confirmação de remoção de produto */}
+      {showDeleteProductModal && editingProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowDeleteProductModal(false)} />
+          <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 animate-scale-in">
+            <h2 className="text-xl font-bold mb-4 text-foreground">Remover Produto</h2>
+            <p className="mb-6 text-muted-foreground">Tem certeza que deseja remover <strong>{editingProduct.p_name}</strong>? Esta ação não pode ser desfeita.</p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowDeleteProductModal(false)}
+                className="px-4 py-2 rounded-xl border border-border text-foreground font-medium hover:bg-cream-100 transition-all duration-300"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDeleteProduct}
+                className="px-4 py-2 rounded-xl bg-red-500 text-white font-medium hover:bg-red-600 transition-all duration-300"
+              >
+                Remover
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Create Category Modal */}
