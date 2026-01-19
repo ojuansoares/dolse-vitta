@@ -78,7 +78,12 @@ export const authApi = {
 
 // Products API
 export const productsApi = {
-  list: () => fetchPublic(`${API_URL}/products`),
+  list: () => {
+    const token = localStorage.getItem('dolce-vitta-auth');
+    return token 
+      ? fetchWithAuth(`${API_URL}/products`) 
+      : fetchPublic(`${API_URL}/products`);
+  },
   get: (id: string) => fetchPublic(`${API_URL}/products/${id}`),
   create: (product: {
     name: string

@@ -2,8 +2,10 @@
 Local development server for Windows
 Run from project root: python -m api.server
 """
+from itertools import product
 import sys
 import os
+from urllib import request
 
 # Add parent directory to path so imports work
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -225,10 +227,17 @@ async def update_profile(request: Request):
 
 # --- PRODUCTS ---
 @app.get("/api/products")
-async def list_products():
+async def list_products(request: Request):
     supabase = get_supabase_client()
-    response = supabase.table("product").select("*").order("p_sort_order").execute()
-    
+    auth_header = request.headers.get("Authorization")
+    if auth_header and "Bearer " in auth_header:
+        token = auth_header.split(" ")[1]
+        supabase.postgrest.auth(token)
+    response = supabase.table("product") \
+        .select("*, category(c_name)") \
+        .order("p_sort_order") \
+        .execute()
+
     products = [{
         "id": p["id"],
         "p_name": p["p_name"],

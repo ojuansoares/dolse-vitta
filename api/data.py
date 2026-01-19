@@ -207,7 +207,14 @@ async def list_products(request: Request):
     """List all products (public) - filtering done on frontend"""
     try:
         supabase = get_supabase_client()
-        response = supabase.table("product").select("*, category(c_name)").order("p_sort_order").execute()
+        auth_header = request.headers.get("Authorization")
+        if auth_header and "Bearer " in auth_header:
+            token = auth_header.split(" ")[1]
+            supabase.postgrest.auth(token)
+        response = supabase.table("product") \
+            .select("*, category(c_name)") \
+            .order("p_sort_order") \
+            .execute()
         
         products = []
         for p in response.data:
