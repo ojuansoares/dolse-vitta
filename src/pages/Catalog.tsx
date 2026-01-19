@@ -158,7 +158,7 @@ export default function Catalog() {
       <header className="text-center mb-12 animate-fade-in">
         <h1 className="font-serif text-4xl sm:text-5xl font-bold text-foreground mb-4">Nosso Cardápio</h1>
         <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-          Delícias artesanais feitas com amor e ingredientes selecionados
+          Tortas que fazem a vida valer cada mordida.
         </p>
       </header>
 

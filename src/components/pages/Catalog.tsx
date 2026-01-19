@@ -346,7 +346,7 @@ export default function Catalog() {
       <header className="text-center mb-12 animate-fade-in">
         <h1 className="font-serif text-4xl sm:text-5xl font-bold text-foreground mb-4">Nosso Cardápio</h1>
         <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-          Delícias artesanais feitas com amor e ingredientes selecionados
+          Tortas que fazem a vida valer cada mordida.
         </p>
       </header>
 
@@ -402,8 +402,7 @@ export default function Catalog() {
           fields={[
             { key: "c_name", label: "Nome", type: "text", value: editingCategory.c_name },
             { key: "c_description", label: "Descrição", type: "textarea", value: editingCategory.c_description || "" },
-            // ...campo de URL removido...
-            { key: "p_image_url", label: "URL da Imagem", type: "text", value: editingProduct?.p_image_url || "" },
+            // campo de URL removido da edição de categoria
           ]}
         />
       )}
@@ -418,6 +417,7 @@ export default function Catalog() {
             { key: "p_name", label: "Nome", type: "text", value: editingProduct.p_name },
             { key: "p_description", label: "Descrição", type: "textarea", value: editingProduct.p_description || "" },
             { key: "p_price", label: "Preço", type: "number", value: editingProduct.p_price },
+            { key: "p_image_url", label: "URL da Imagem", type: "text", value: editingProduct.p_image_url || "" },
             {
               key: "p_is_available",
               label: "Disponível",
