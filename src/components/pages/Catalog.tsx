@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { DragDropContext, Droppable, Draggable, DropResult } from "react-beautiful-dnd"
 import { Plus } from "lucide-react"
 import { categoriesApi, productsApi } from "@/services/api"
 import { useAuth } from "@/hooks/useAuth"
@@ -28,6 +29,66 @@ interface Category {
 }
 
 export default function Catalog() {
+    // Função para reordenar array
+    function reorder<T>(list: T[], startIndex: number, endIndex: number): T[] {
+      const result = Array.from(list);
+      const [removed] = result.splice(startIndex, 1);
+      result.splice(endIndex, 0, removed);
+      return result;
+    }
+
+    // Handler de drag para categorias e produtos
+    const onDragEnd = async (result: DropResult) => {
+      const { destination, source, type } = result;
+
+      if (!destination) return;
+
+      // Se nada mudou de lugar, ignora
+      if (
+        destination.droppableId === source.droppableId &&
+        destination.index === source.index
+      ) return;
+
+      if (type === "CATEGORY") {
+        const newCategories = reorder(categories, source.index, destination.index);
+        setCategories(newCategories);
+        try {
+          await categoriesApi.reorder(newCategories.map((cat, idx) => ({ id: cat.id, sort_order: idx + 1 })));
+        } catch (err) {
+          console.error("Erro ao reordenar categorias:", err);
+        }
+      } 
+      
+      // Agora usamos apenas "PRODUCT"
+      else if (type === "PRODUCT") {
+        const catId = source.droppableId; // No CategorySection o droppableId é o ID da categoria
+        const catIdx = categories.findIndex(c => c.id === catId);
+        
+        if (catIdx === -1) return;
+        
+        const category = categories[catIdx];
+        const productsInCat = [...(category.products || [])];
+        
+        // Reordena os produtos daquela categoria específica
+        const newProducts = reorder(productsInCat, source.index, destination.index);
+        
+        // Atualiza o estado das categorias localmente
+        const newCategories = [...categories];
+        newCategories[catIdx] = { ...category, products: newProducts };
+        setCategories(newCategories);
+
+        // Atualiza no backend
+        try {
+          await productsApi.reorder(newProducts.map((prod, idx) => ({ 
+            id: prod.id, 
+            sort_order: idx + 1 
+          })));
+        } catch (err) {
+          console.error("Erro ao reordenar produtos:", err);
+          // Opcional: recarregar dados se falhar
+        }
+      }
+    };
   const { user } = useAuth()
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
@@ -377,27 +438,44 @@ export default function Catalog() {
         </div>
       )}
 
-      {/* Categories */}
-      <div className="space-y-12">
-        {categories.length > 0 ? (
-          categories.map((category) => (
-            <CategorySection
-              key={category.id}
-              category={category}
-              isEditing={isEditing}
-              isAdmin={!!user}
-              onEditCategory={handleEditCategory}
-              onEditProduct={handleEditProduct}
-              onAddProduct={handleAddProduct}
-              onDeleteCategory={handleDeleteCategory}
-            />
-          ))
-        ) : (
-          <div className="text-center py-20">
-            <p className="text-muted-foreground text-lg">Nenhum produto disponível no momento</p>
-          </div>
-        )}
-      </div>
+      {/* Categories - Drag and Drop */}
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="categories-droppable" type="CATEGORY">
+          {(provided) => (
+            <div className="space-y-12" ref={provided.innerRef} {...provided.droppableProps}>
+              {categories.length > 0 ? (
+                categories.map((category, idx) => (
+                  <Draggable key={category.id} draggableId={category.id} index={idx} isDragDisabled={!isEditing}>
+                    {(dragProvided) => (
+                      <div
+                        ref={dragProvided.innerRef}
+                        {...dragProvided.draggableProps}
+                      >
+                        <CategorySection
+                          category={category}
+                          isEditing={isEditing}
+                          isAdmin={!!user}
+                          onEditCategory={handleEditCategory}
+                          onEditProduct={handleEditProduct}
+                          onAddProduct={handleAddProduct}
+                          onDeleteCategory={handleDeleteCategory}
+                          dragHandleProps={dragProvided.dragHandleProps}
+                          enableProductDnD={true}
+                        />
+                      </div>
+                    )}
+                  </Draggable>
+                ))
+              ) : (
+                <div className="text-center py-20">
+                  <p className="text-muted-foreground text-lg">Nenhum produto disponível no momento</p>
+                </div>
+              )}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
 
       {/* Admin floating button */}
       {user && (
