@@ -189,10 +189,176 @@ export default function About() {
 
       {/* Specialty */}
       {about.ab_specialty && (
-        <section className="mb-8 animate-slide-up" style={{ animationDelay: "0.2s" }}>
-          <h2 className="font-serif text-2xl font-bold text-foreground mb-4">Especialidades</h2>
-          <p className="text-muted-foreground leading-relaxed">{about.ab_specialty}</p>
-        </section>
+        <>
+          <section className="mb-8 animate-slide-up" style={{ animationDelay: "0.2s" }}>
+            <h2 className="font-serif text-2xl font-bold text-foreground mb-4">Especialidades</h2>
+            <p className="text-muted-foreground leading-relaxed">{about.ab_specialty}</p>
+          </section>
+
+          {/* Nossa Essência - Fixed Section */}
+          <section className="mb-12 animate-slide-up" style={{ animationDelay: "0.25s" }}>
+            <div className="rounded-3xl p-8 sm:p-10" style={{ backgroundColor: "#fdf2ec" }}>
+              {/* Header */}
+              <div className="text-center mb-8">
+                <h2
+                  className="text-3xl sm:text-4xl mb-2"
+                  style={{
+                    fontFamily: "Georgia, 'Times New Roman', serif",
+                    fontStyle: "italic",
+                    color: "#8B7355",
+                  }}
+                >
+                  Nossa Essência
+                </h2>
+                <p
+                  className="text-base sm:text-lg mb-4"
+                  style={{
+                    fontFamily: "Georgia, 'Times New Roman', serif",
+                    fontStyle: "italic",
+                    color: "#a08070",
+                  }}
+                >
+                  Tortas que fazem a vida valer cada mordida.
+                </p>
+                {/* Decorative line */}
+                <div className="flex items-center justify-center gap-2">
+                  <div className="h-px w-16 sm:w-24" style={{ backgroundColor: "#d4b8a8" }} />
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "#d4b8a8" }} />
+                  <div className="h-px w-16 sm:w-24" style={{ backgroundColor: "#d4b8a8" }} />
+                </div>
+              </div>
+
+              {/* Cards */}
+              <div className="grid sm:grid-cols-3 gap-6 mb-8">
+                {/* Missão */}
+                <div
+                  className="rounded-2xl p-6 pt-8 text-center relative"
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.85)",
+                    border: "1px solid rgba(212, 184, 168, 0.3)",
+                  }}
+                >
+                  {/* Icon - Heart with whisk */}
+                  <div className="absolute -top-5 left-1/2 -translate-x-1/2">
+                    <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+                      <ellipse cx="22" cy="18" rx="14" ry="12" fill="#f5d5c8" />
+                      <path
+                        d="M22 12c-2.5-2.5-6.5-2.5-9 0s-2.5 6.5 0 9l9 9 9-9c2.5-2.5 2.5-6.5 0-9s-6.5-2.5-9 0z"
+                        fill="#e8c4b8"
+                        stroke="#c9a090"
+                        strokeWidth="1"
+                      />
+                      <path d="M30 24l2 12M32 28h-4M32 32h-4" stroke="#c9a090" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                  </div>
+                  <h3
+                    className="text-lg font-medium mt-2 mb-3"
+                    style={{
+                      fontFamily: "Georgia, 'Times New Roman', serif",
+                      color: "#8B7355",
+                    }}
+                  >
+                    Nossa Missão
+                  </h3>
+                  <p className="text-sm leading-relaxed" style={{ color: "#9a8a7a" }}>
+                    Criar tortas artesanais que transformem momentos simples em experiências especiais, unindo sabor, cuidado
+                    e beleza em cada receita.
+                  </p>
+                </div>
+
+                {/* Visão */}
+                <div
+                  className="rounded-2xl p-6 pt-8 text-center relative"
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.85)",
+                    border: "1px solid rgba(212, 184, 168, 0.3)",
+                  }}
+                >
+                  {/* Icon - Star */}
+                  <div className="absolute -top-5 left-1/2 -translate-x-1/2">
+                    <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+                      <path
+                        d="M22 8l4 12h12l-10 7 4 12-10-7-10 7 4-12-10-7h12l4-12z"
+                        fill="#fceabb"
+                        stroke="#e0c080"
+                        strokeWidth="1"
+                      />
+                    </svg>
+                  </div>
+                  <h3
+                    className="text-lg font-medium mt-2 mb-3"
+                    style={{
+                      fontFamily: "Georgia, 'Times New Roman', serif",
+                      color: "#8B7355",
+                    }}
+                  >
+                    Nossa Visão
+                  </h3>
+                  <p className="text-sm leading-relaxed" style={{ color: "#9a8a7a" }}>
+                    Ser referência em tortas artesanais que despertam memórias afetivas e fazem a vida valer cada mordida.
+                  </p>
+                </div>
+
+                {/* Valores */}
+                <div
+                  className="rounded-2xl p-6 pt-8 text-center relative"
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.85)",
+                    border: "1px solid rgba(212, 184, 168, 0.3)",
+                  }}
+                >
+                  {/* Icon - Bow */}
+                  <div className="absolute -top-5 left-1/2 -translate-x-1/2">
+                    <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+                      <path
+                        d="M22 20c-8 0-12-6-12-6s4-6 12-6 12 6 12 6-4 6-12 6z"
+                        fill="#f5d5c8"
+                        stroke="#c9a090"
+                        strokeWidth="1"
+                      />
+                      <path
+                        d="M22 20c8 0 12 6 12 6s-4 6-12 6-12-6-12-6 4-6 12-6z"
+                        fill="#f5d5c8"
+                        stroke="#c9a090"
+                        strokeWidth="1"
+                      />
+                      <circle cx="22" cy="20" r="4" fill="#c9a090" />
+                      <path d="M20 24v10M24 24v10" stroke="#c9a090" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                  </div>
+                  <h3
+                    className="text-lg font-medium mt-2 mb-3"
+                    style={{
+                      fontFamily: "Georgia, 'Times New Roman', serif",
+                      color: "#8B7355",
+                    }}
+                  >
+                    Nossos Valores
+                  </h3>
+                  <ul className="text-sm text-left space-y-1 pl-2" style={{ color: "#9a8a7a" }}>
+                    <li>• Cuidado em cada detalhe</li>
+                    <li>• Qualidade artesanal</li>
+                    <li>• Respeito e ética</li>
+                    <li>• Criatividade para encantar</li>
+                    <li>• Amor pelo que fazemos</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Footer quote */}
+              <p
+                className="text-center text-sm sm:text-base"
+                style={{
+                  fontFamily: "Georgia, 'Times New Roman', serif",
+                  fontStyle: "italic",
+                  color: "#a08070",
+                }}
+              >
+                Porque acreditamos que cada mordida pode tornar a vida mais doce.
+              </p>
+            </div>
+          </section>
+        </>
       )}
 
       {/* Contact Info */}
