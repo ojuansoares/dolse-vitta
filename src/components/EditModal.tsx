@@ -85,18 +85,29 @@ export default function EditModal({ title, onClose, onSave, fields, extraActions
   }, [fields])
 
   // Format currency as 0,00 and allow only numbers
-  const formatCurrency = (value: string): string => {
-    const numbers = value.replace(/\D/g, "")
-    if (!numbers) return ""
+  const formatCurrency = (value: string | number): string => {
+    // Converte para string e pega apenas os números
+    const numbers = String(value).replace(/\D/g, "")
+    if (!numbers) return "0,00"
+    
+    // Lógica de centavos
     const cents = numbers.padStart(3, "0")
     const intPart = cents.slice(0, -2)
     const decimalPart = cents.slice(-2)
+    
+    // Retorna formatado para o input: 1000 -> 10,00
     return `${parseInt(intPart, 10)},${decimalPart}`.replace(/^0+(?!,)/, "")
   }
 
-  const parseCurrency = (value: string): number => {
-    if (!value) return 0
-    return parseFloat(value.replace(/\./g, "").replace(",", "."))
+  const parseCurrency = (value: string | number): number => {
+    if (value === undefined || value === null || value === "") return 0
+    
+    // Se já for um número, apenas retorna ele
+    if (typeof value === "number") return value
+  
+    // Se for string, limpa a formatação brasileira e converte para decimal (padrão banco)
+    const cleanValue = value.replace(/\./g, "").replace(",", ".")
+    return parseFloat(cleanValue) || 0
   }
 
   const handleChange = (key: string, value: string | number | boolean, fieldType?: string) => {

@@ -136,6 +136,18 @@ export default function CategorySection({ category, isEditing, isAdmin, onEditCa
                   )}
                 </Draggable>
               ))}
+              {/* Add Product Button (DnD mode, only in edit mode) */}
+              {isEditing && onAddProduct && (
+                <div>
+                  <button
+                    onClick={() => onAddProduct(category.id)}
+                    className="aspect-square flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-brown-300 text-brown-600 hover:bg-brown-50 hover:border-brown-400 transition-all duration-300 w-full h-full min-h-[120px] min-w-[120px]"
+                  >
+                    <Plus className="w-8 h-8" />
+                    <span className="text-sm font-medium">Adicionar Produto</span>
+                  </button>
+                </div>
+              )}
               {provided.placeholder}
             </div>
           )}

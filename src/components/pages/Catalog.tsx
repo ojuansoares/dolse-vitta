@@ -368,10 +368,6 @@ export default function Catalog() {
     }
   }
 
-  const handleAddProduct = (categoryId: string) => {
-    setCreatingProductForCategory(categoryId)
-  }
-
   const handleDeleteCategory = (categoryId: string) => {
     setDeletingCategoryId(categoryId)
   }
@@ -457,7 +453,7 @@ export default function Catalog() {
                           isAdmin={!!user}
                           onEditCategory={handleEditCategory}
                           onEditProduct={handleEditProduct}
-                          onAddProduct={handleAddProduct}
+                          onAddProduct={(categoryId) => setCreatingProductForCategory(categoryId)}
                           onDeleteCategory={handleDeleteCategory}
                           dragHandleProps={dragProvided.dragHandleProps}
                           enableProductDnD={true}
@@ -508,7 +504,7 @@ export default function Catalog() {
           fields={[
             { key: "p_name", label: "Nome", type: "text", value: editingProduct.p_name },
             { key: "p_description", label: "Descrição", type: "textarea", value: editingProduct.p_description || "" },
-            { key: "p_price", label: "Preço", type: "number", value: editingProduct.p_price },
+            { key: "p_price", label: "Preço", type: "currency", value: editingProduct.p_price, required: true, placeholder: "0,00" },
             { key: "p_image_url", label: "URL da Imagem", type: "text", value: editingProduct.p_image_url || "" },
             {
               key: "p_is_available",
