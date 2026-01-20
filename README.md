@@ -51,16 +51,15 @@ Criar uma solução completa para pequenos empreendedores do ramo de confeitaria
 
 ### 👨‍💼 Área Administrativa
 - ✅ Autenticação segura com Supabase Auth
-- ✅ Dashboard com visão geral
 - ✅ CRUD completo de produtos
 - ✅ Gerenciamento de categorias
 - ✅ Histórico de pedidos
-- ✅ Perfil do administrador
+- ✅ Área do administrador
 
-### 🛍️ Catálogo (Em desenvolvimento)
-- 🔄 Vitrine de produtos
-- 🔄 Carrinho de compras
-- 🔄 Finalização via WhatsApp
+### 🛍️ Catálogo
+- ✅ Vitrine de produtos
+- ✅ Carrinho de compras
+- ✅ Finalização via WhatsApp
 
 ---
 
@@ -94,25 +93,30 @@ Criar uma solução completa para pequenos empreendedores do ramo de confeitaria
 
 ```
 dolce-vitta/
-├── 📂 api/                     # Backend (Serverless Functions)
-│   ├── auth.py                # Autenticação (login, register, logout)
-│   ├── users.py               # Gerenciamento de perfil
-│   ├── products/              # CRUD de produtos
-│   ├── categories/            # CRUD de categorias
-│   ├── orders/                # Gerenciamento de pedidos
-│   └── _utils/                # Utilitários (Supabase client, middleware)
-│
-├── 📂 src/                     # Frontend (React)
-│   ├── components/            # Componentes reutilizáveis
-│   ├── pages/                 # Páginas da aplicação
-│   ├── services/              # Serviços (API, Supabase)
-│   ├── contexts/              # Context API (Auth)
-│   └── hooks/                 # Custom hooks
-│
-├── 📂 public/                  # Arquivos estáticos
-├── 📂 supabase/                # Schema do banco de dados
-├── 📄 vercel.json             # Configuração de deploy
-└── 📄 requirements.txt        # Dependências Python
+├── 📂 api/                # Backend FastAPI (serverless)
+│   ├── _server.py      # Entry point FastAPI
+│   ├── auth.py         # Autenticação
+│   ├── users.py        # Usuários/admin
+│   ├── checkout.py     # Pedidos
+│   ├── data.py         # Dados utilitários
+│   ├── reorder.py      # Reordenação
+│   ├── ...             # Outros endpoints
+│   └── _utils/         # Supabase/middleware
+├── 📂 src/                # Frontend React
+│   ├── components/     # Componentes UI
+│   │   └── pages/      # Páginas principais
+│   ├── pages/          # Páginas principais (alternativo)
+│   ├── contexts/       # Contextos (Auth, Cart)
+│   ├── hooks/          # Custom hooks
+│   ├── services/       # API/Supabase helpers
+│   ├── styles/         # CSS global
+│   ├── lib/            # Funções utilitárias
+│   └── public/         # Assets estáticos
+├── 📂 supabase/           # Schema SQL
+├── requirements.txt    # Dependências Python
+├── package.json        # Dependências Node
+├── vercel.json         # Configuração Vercel
+└── README.md           # Documentação
 ```
 
 ---
