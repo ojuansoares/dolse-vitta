@@ -4,11 +4,17 @@
   <strong>Sistema de gerenciamento para confeitaria artesanal</strong>
 </p>
 
-<p align="center">
-  <!-- Espaço reservado para GIF de demonstração -->
-  <img src="" alt="GIF" width="600" />
-  <br>
-</p>
+<div align="center">
+  <strong>Visão Cliente</strong>
+  <video src="https://github.com/user-attachments/assets/258a542e-f7a1-4beb-a490-9aa4c8c50a42" width="800" muted autoplay loop playsinline>
+  </video>
+</div>
+
+<div align="center">
+  <strong>Visão Admin</strong>
+  <video src="https://github.com/user-attachments/assets/a3f6bef1-4461-48e8-a1cb-55ca67b4e699" width="800" muted autoplay loop playsinline>
+  </video>
+</div>
 
 <p align="center">
   <img src="https://img.shields.io/badge/React-18.2.0-61DAFB?style=for-the-badge&logo=react&logoColor=white" alt="React" />
